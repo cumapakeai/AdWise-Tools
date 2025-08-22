@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analisis Iklan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#101318; --ink:#ffffff; --muted:#b7c0cc;
+      --blue:#3a9eff; --line:rgba(58,158,255,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:radial-gradient(1000px 800px at -10% 120%, rgba(58,158,255,.09), transparent 55%), var(--bg);
+      font-family:'Poppins',sans-serif; color:var(--ink);
+    }
+    .container{max-width:1100px;margin:36px auto;padding:0 20px}
+    .header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)}
+    h1{font-size:22px;margin:0;color:var(--blue)}
+    .section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 4px;margin-bottom:22px;box-shadow:0 12px 28px -18px rgba(0,0,0,.5)}
+    .title{display:flex;align-items:center;gap:10px;margin:-6px 0 14px;font-weight:600;color:var(--blue)}
+    .grid-1{display:grid;grid-template-columns: 220px 1fr;gap:10px 16px;align-items:center}
+    .grid-2{display:grid;grid-template-columns: repeat(2, 1fr);gap:14px}
+    .pair{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:center}
+    label{color:var(--muted);font-size:13px}
+    input,textarea{
+      width:100%;background:#0c0f14;color:var(--ink);border:1px solid var(--line);
+      border-radius:10px;padding:10px 12px;font-size:14px;outline:none;
+      transition:border .15s, box-shadow .15s;
+    }
+    textarea{min-height:92px;resize:vertical}
+    input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,158,255,.18)}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .btn{
+      width:100%;margin-top:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--blue);
+      background:linear-gradient(180deg, rgba(58,158,255,.32), rgba(58,158,255,.2));
+      color:#fff;font-weight:700;cursor:pointer;box-shadow:0 14px 28px -16px rgba(58,158,255,.35);
+      transition:transform .06s, box-shadow .2s;
+    }
+    .btn:hover{box-shadow:0 0 16px rgba(58,158,255,.55)}
+    .btn:active{transform:translateY(1px)}
+    a.result{display:block;margin-top:14px;text-align:center;background:var(--blue);padding:14px;border-radius:12px;
+      color:#fff;text-decoration:none;font-weight:700}
+    @media (max-width:900px){
+      .grid-1{grid-template-columns:1fr}
+      .pair{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><span class="dot"></span><h1>Analisis Iklan</h1></div>
+
+    <!-- =================== DATA PRODUK =================== -->
+    <div class="section">
+      <div class="title">📘 Data Produk</div>
+      <div class="grid-1">
+        <label for="namaProduk">Nama Produk</label>
+        <input id="namaProduk" placeholder="cth: E-Book 7 Hari Bisa Ngonten"/>
+
+        <label for="deskripsi">Deskripsi Produk</label>
+        <textarea id="deskripsi" placeholder="Deskripsi singkat produk"></textarea>
+
+        <label for="target">Target Market (maks 10)</label>
+        <div>
+          <textarea id="target" placeholder="Satu baris = satu target market (maks 10 baris)"></textarea>
+          <div class="hint">Pisahkan setiap target dengan Enter</div>
+        </div>
+
+        <label for="value">Value (maks 10)</label>
+        <div>
+          <textarea id="value" placeholder="Satu baris = satu value (maks 10 baris)"></textarea>
+          <div class="hint">Pisahkan setiap value dengan Enter</div>
+        </div>
+
+        <label for="keunikan">Keunikan Produk</label>
+        <textarea id="keunikan" placeholder="Apa yang paling unik dari produkmu?"></textarea>
+      </div>
+    </div>
+
+    <!-- =================== DATA IKLAN =================== -->
+    <div class="section">
+      <div class="title">📊 Data Iklan</div>
+
+      <div class="grid-2">
+        <div class="pair"><label for="budget">Budget Ads</label><input id="budget"/></div>
+        <div class="pair"><label for="cpp">Cost Per Purchase</label><input id="cpp"/></div>
+        <div class="pair"><label for="cpm">CPM</label><input id="cpm"/></div>
+        <div class="pair"><label for="cpc">CPC</label><input id="cpc"/></div>
+        <div class="pair"><label for="ctr">CTR %</label><input id="ctr"/></div>
+        <div class="pair"><label for="oclp">OCLP %</label><input id="oclp"/></div>
+        <div class="pair"><label for="lpview">LP View / Content View</label><input id="lpview"/></div>
+        <div class="pair"><label for="checkout">Initiate Checkout</label><input id="checkout"/></div>
+        <div class="pair"><label for="payment">Add Payment Info</label><input id="payment"/></div>
+        <div class="pair"><label for="purchase">Purchase</label><input id="purchase"/></div>
+        <div class="pair"><label for="roas">ROAS</label><input id="roas"/></div>
+        <div class="pair"><label for="adspend">Ad Spend</label><input id="adspend"/></div>
+      </div>
+    </div>
+
+    <button class="btn" id="btnGen">Analisis Iklan Mu Sekarang</button>
+    <button class="btn" onclick="location.href='AdWise Tools.html'">⬅️ Back</button>
+    <div id="result"></div>
+  </div>
+
+  <script type="module">
+  // ===== Firebase config milikmu =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+    authDomain: "tools-ad-wise.firebaseapp.com",
+    projectId: "tools-ad-wise"
+  };
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ====== GUARD: WAJIB SUDAH AKTIVASI & SESSION VALID ======
+  const pretty    = localStorage.getItem('license_pretty') || '';
+  const sessionId = localStorage.getItem('license_session') || '';
+
+  // Belum aktivasi → tendang ke login
+  if (!pretty || !sessionId) {
+    location.href = "index.html";
+  }
+
+  const keyId = pretty.replace(/-/g,'');
+
+  // Samakan algoritma deviceId dengan halaman aktivasi
+  async function getDeviceId() {
+    const seed = [
+      navigator.userAgent,
+      navigator.platform,
+      screen.width + 'x' + screen.height,
+      Intl.DateTimeFormat().resolvedOptions().timeZone || 'tz'
+    ].join('|');
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(seed));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // Verifikasi session + heartbeat (<= 90 detik)
+  const TTL_MS = 90 * 1000;
+
+  async function guard() {
+    try {
+      const ref  = doc(db, 'license_keys', keyId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return kick();
+
+      const data = snap.data();
+      if (data.revoked) return kick();
+
+      const stored = localStorage.getItem('device_id');
+      const deviceId = stored || await getDeviceId();
+
+      const lastSeenMs = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+      const fresh = lastSeenMs && (Date.now() - lastSeenMs) <= TTL_MS;
+
+      const valid = (data.activeDeviceId === deviceId) &&
+                    (data.activeSessionId === sessionId) &&
+                    fresh;
+
+      if (!valid) return kick();
+
+      // Heartbeat supaya session tetap “hidup”
+      window.__hb = setInterval(async () => {
+        try { await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge: true }); } catch (_) {}
+      }, 30000);
+
+      // Saat tab ditutup, kalau masih session yg sama boleh dilepas (opsional)
+      window.addEventListener('beforeunload', async () => {
+        clearInterval(window.__hb);
+        try {
+          const s = await getDoc(ref); const d = s.data();
+          if (d && d.activeSessionId === sessionId) {
+            // biarkan tetap aktif (biar bisa lanjut) — atau kalau mau force-lepas, uncomment:
+            // await setDoc(ref, { activeDeviceId: null, activeSessionId: null }, { merge: true });
+          }
+        } catch (_) {}
+      });
+
+    } catch (_) {
+      kick();
+    }
+  }
+
+  function kick() {
+    location.href = "index.html";
+  }
+
+  await guard(); // jangan jalanin fitur lain sebelum guard lolos
+
+  // ================== PROMPT BUILDER (tetap sama) ==================
+  const v = id => (document.getElementById(id).value || '').trim();
+  function toTenLines(txt){
+    const arr = (txt||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,10);
+    while(arr.length<10) arr.push('');
+    return arr;
+  }
+
+  document.getElementById('btnGen').addEventListener('click', ()=>{
+    const namaProduk=v('namaProduk'),deskripsi=v('deskripsi'),
+          target=toTenLines(v('target')),value=toTenLines(v('value')),
+          keunikan=v('keunikan');
+
+    const budget=v('budget'),cpp=v('cpp'),cpm=v('cpm'),cpc=v('cpc'),
+          ctr=v('ctr'),oclp=v('oclp'),lpview=v('lpview'),checkout=v('checkout'),
+          payment=v('payment'),purchase=v('purchase'),roas=v('roas'),adspend=v('adspend');
+
+    const prompt =
+`Halo Bro Gua Punya Produk "${namaProduk}"
+Sedikit Deskripsi Tentang Produk Gua "${deskripsi}"
+Produk Gua Itu Target Marketnya Yaitu :
+1. ${target[0]}
+2. ${target[1]}
+3. ${target[2]}
+4. ${target[3]}
+5. ${target[4]}
+6. ${target[5]}
+7. ${target[6]}
+8. ${target[7]}
+9. ${target[8]}
+10. ${target[9]}
+dan produk gua memiliki beberapa value yaitu :
+1. ${value[0]}
+2. ${value[1]}
+3. ${value[2]}
+4. ${value[3]}
+5. ${value[4]}
+6. ${value[5]}
+7. ${value[6]}
+8. ${value[7]}
+9. ${value[8]}
+10. ${value[9]}
+serta keunikan produk gua dari produk yang sudah ada di pasaran ialah "${keunikan}"
+Gua udah menjalankan  iklan dan gua berikan beberapa data dibawah ini
+1. Budget Ads : ${budget}
+2. Cost Per Purchase : ${cpp}
+3. CPM : ${cpm}
+4. CPC : ${cpc}
+5 CTR % : ${ctr}
+6. OCLP % : ${oclp}
+7. LP View/Content View : ${lpview}
+8. Inisiate Checkout : ${checkout}
+9. Add Payment Info : ${payment}
+10. Purchase : ${purchase}
+11. ROAS : ${roas}
+12. Ad Spend : ${adspend}
+
+gua mau dari data dan info produk yang gua berikan lo analisis data iklan gua gimana, dan gua mau lo memberi gua saran apa langkah selanjutnya yang harus gua lakukan.
+
+gua juga mau lo memberikan saran script untuk koten video dengan struktur hook, bridging, isi, value dan CTA gunakan hook yang sangat nancep pada audience shingga konten ini meskipun audience tau tapi tetap tidak mau skip dengan hook yang nancep serta bridging yang semakin membuat audience semakin tidak mau skip begitupun dengan isi serta buat value itu menjelaskan value dari produk gua yang sudah ada diatas, buat sebisa mungkin orang yang nonton merasa value produk ini melebihi ketimbang harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat woerth it, serta buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
+
+Gua mau lo buatin gua script konten iklan nya dari 7 angle yaitu :
+1. "Problem → Agitasi → Solusi (Pain Point Based)"
+2. Transformasi / Before After
+3. Testimoni / Social Proof
+4. Value Nugget (Edukasi Singkat)
+5. Urgency & Scarcity
+6. Lifestyle / Aspirational
+7. Relatable Storytelling
+
+buat durasi video maksimal 90 detik namun script yang lumayan padat tidak hanya script pendek doang namun bener bener script yang bisa dijadikan sebuah video dari setiap angle dengan durasi 90 detik.
+
+Gua juga mau lo buatin gua copywriting iklan yang terdiri dari headline, primary text, CTA Button buat satu dari setiap angle yang sama dengan script video.`;
+
+    const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+    document.getElementById('result').innerHTML =
+      `<a class="result" href="${url}" target="_blank">➡️ Buka Analisis di GPT</a>`;
+  });
+</script>
+</body>
+</html>

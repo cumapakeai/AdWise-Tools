@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analisa Funnel & Rekomendasi Meta Ads</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#0f1217; --ink:#ffffff; --muted:#b7c0cc;
+      --blue:#3a9eff; --line:rgba(58,158,255,.28); --panel-2:#0c0f14;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:
+        radial-gradient(1100px 900px at 110% -10%, rgba(58,158,255,.08), transparent 55%),
+        radial-gradient(900px 700px at -10% 110%, rgba(58,158,255,.08), transparent 60%),
+        var(--bg);
+      font-family:'Poppins',sans-serif; color:var(--ink);
+    }
+    .wrap{max-width:980px; margin:36px auto; padding:0 22px}
+    .head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+    h1{margin:0;font-size:22px;color:var(--blue)}
+    h2{margin:10px 0 14px;font-size:16px;color:var(--blue)}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--panel);
+      border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px;
+      box-shadow:0 18px 40px -26px rgba(0,0,0,.6);
+    }
+    .grid{display:grid; gap:14px}
+    .grid.two{grid-template-columns:1fr}
+    .grid.three{grid-template-columns:1fr}
+    @media(min-width:820px){
+      .grid.two{grid-template-columns:1fr 1fr}
+      .grid.three{grid-template-columns:1fr 1fr 1fr}
+    }
+    .field{display:flex;flex-direction:column;gap:8px}
+    .label{font-size:13px;color:var(--muted)}
+    input, textarea, select{
+      width:100%; background:var(--panel-2); color:var(--ink); border:1px solid var(--line);
+      border-radius:12px; padding:12px 14px; font-size:14px; outline:none; transition:border .15s, box-shadow .15s;
+    }
+    input:focus, textarea:focus, select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,158,255,.18)}
+    textarea{min-height:84px; resize:vertical}
+    .hint{font-size:12px;color:var(--muted);margin-top:-6px}
+
+    .list{display:grid; gap:8px}
+    .row{display:grid; grid-template-columns: 34px 1fr; gap:8px; align-items:center}
+    .num{
+      width:34px; height:40px; display:flex; align-items:center; justify-content:center;
+      border:1px solid var(--line); border-radius:10px; background:#0a0d12; color:var(--muted);
+      font-weight:600;
+    }
+    .row input{height:40px; padding:0 12px}
+
+    .checks{display:flex; flex-wrap:wrap; gap:10px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px;
+      background:var(--panel-2); border:1px solid var(--line); cursor:pointer; user-select:none;
+      font-size:14px;
+    }
+    .chip input{accent-color:#3a9eff}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+      border:1px solid var(--blue); color:#fff; font-weight:700; padding:14px 16px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(58,158,255,.34), rgba(58,158,255,.22));
+      box-shadow:0 16px 36px -18px rgba(58,158,255,.35);
+      cursor:pointer; text-decoration:none; transition:transform .06s, box-shadow .2s;
+    }
+    .btn:hover{box-shadow:0 0 16px rgba(58,158,255,.55)}
+    .btn:active{transform:translateY(1px)}
+    .btn-row{display:grid;grid-template-columns:1fr auto; gap:14px; margin-top:6px}
+    @media(max-width:640px){ .btn-row{grid-template-columns:1fr}}
+    .btn-open{display:none; margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head"><span class="dot"></span><h1>Analisa Funnel & Rekomendasi Meta Ads</h1></div>
+
+    <!-- 1) Produk & Penawaran -->
+    <div class="card">
+      <h2>1) Produk & Penawaran</h2>
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="nama">Nama Produk</label>
+          <input id="nama" placeholder="cth: E-Book 7 Hari Bisa Ngonten"/>
+        </div>
+        <div class="field">
+          <label class="label" for="jenis">Jenis Produk</label>
+          <select id="jenis">
+            <option value="Digital">Digital</option>
+            <option value="Fisik">Fisik</option>
+            <option value="Jasa">Jasa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="harga">Harga Jual (Rp)</label>
+          <input id="harga" placeholder="cth: 149000"/>
+          <div class="hint">Tulis angka saja, contoh: 149000</div>
+        </div>
+        <div class="field">
+          <label class="label">Diskon?</label>
+          <div class="grid two">
+            <select id="diskonAda">
+              <option>Tidak</option>
+              <option>Ya</option>
+            </select>
+            <input id="diskonMenjadi" placeholder="Jika Ya, jadi berapa (Rp)"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="field">
+          <label class="label">Nilai Tambah / Bonus (maks 3)</label>
+          <div id="bonusList" class="list"></div>
+          <div class="hint">Isi hingga 3 poin bonus</div>
+        </div>
+        <div class="field">
+          <label class="label" for="refund">Refund/Garansi</label>
+          <select id="refund">
+            <option value="Tidak">Tidak</option>
+            <option value="7 hari">7 hari</option>
+            <option value="14 hari">14 hari</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2) Target Market (singkat) -->
+    <div class="card">
+      <h2>2) Target Market (singkat)</h2>
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="persona">Persona (1 kalimat)</label>
+          <input id="persona" placeholder="cth: Karyawan 20–30, mau income sampingan"/>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label class="label">Top 5 Pain Point</label>
+          <div id="painList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="desired">Desired Outcome (1–2 kalimat)</label>
+          <textarea id="desired" placeholder="Hasil akhir yang paling diinginkan audience"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3) Bukti Sosial & Trust -->
+    <div class="card">
+      <h2>3) Bukti Sosial & Trust</h2>
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="testi">Testimoni ada?</label>
+          <select id="testi">
+            <option value="Tidak">Tidak</option>
+            <option value="1–3">1–3</option>
+            <option value="4+">4+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Bukti Visual</label>
+          <div class="checks">
+            <label class="chip"><input type="checkbox" id="bv_ba"> Before–After</label>
+            <label class="chip"><input type="checkbox" id="bv_sr"> Screen record hasil</label>
+            <label class="chip"><input type="checkbox" id="bv_ugc"> UGC Testimonial</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4) Infrastruktur & Kapasitas -->
+    <div class="card">
+      <h2>4) Infrastruktur & Kapasitas</h2>
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="web">Punya website/checkout?</label>
+          <select id="web"><option>Tidak</option><option>Ya</option></select>
+        </div>
+        <div class="field">
+          <label class="label" for="pg">Payment gateway siap?</label>
+          <select id="pg"><option>Tidak</option><option>Ya</option></select>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="pixel">Pixel Meta terpasang?</label>
+          <select id="pixel"><option>Tidak</option><option>Belum tahu</option><option>Ya</option></select>
+        </div>
+        <div class="field">
+          <label class="label" for="wa">WhatsApp Business siap?</label>
+          <select id="wa"><option>Tidak</option><option>Ya</option></select>
+        </div>
+      </div>
+
+      <div class="grid three">
+        <div class="field">
+          <label class="label" for="cs">CS tersedia?</label>
+          <select id="cs"><option>Tidak</option><option>Ya</option></select>
+        </div>
+        <div class="field">
+          <label class="label" for="csAdmin">Jumlah admin (jika Ya)</label>
+          <input id="csAdmin" placeholder="cth: 2"/>
+        </div>
+        <div class="field">
+          <label class="label" for="csSLA">Perkiraan respon</label>
+          <select id="csSLA">
+            <option>&lt;5 mnt</option>
+            <option>5–15 mnt</option>
+            <option>&gt;15 mnt</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5) Tujuan & Budget -->
+    <div class="card">
+      <h2>5) Tujuan & Budget</h2>
+      <div class="grid two">
+        <div class="field">
+          <label class="label" for="ret">Target pengembalian</label>
+          <select id="ret">
+            <option>D0</option><option>D7</option><option>D14</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="budget">Budget harian</label>
+          <select id="budget">
+            <option>50k</option><option>100k</option><option>200k</option><option>300k+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="jalur">Prefer jalur awal?</label>
+          <select id="jalur">
+            <option>Bebasin tools nentuin</option>
+            <option>Chat WA</option>
+            <option>Website</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnGen" class="btn">🧭 Buka Rekomendasi di GPT</button>
+        <button class="btn" onclick="location.href='AdWise Tools.html'">⬅️ Back</button>
+      </div>
+      <a id="openGPT" class="btn btn-open" target="_blank">➡️ Klik di sini jika tidak otomatis</a>
+    </div>
+  </div>
+
+  <script type="module">
+    /* ============== Guard lisensi + heartbeat (90 dtk) ============== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+      authDomain: "tools-ad-wise.firebaseapp.com",
+      projectId: "tools-ad-wise"
+    };
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const pretty    = localStorage.getItem('license_pretty') || '';
+    const sessionId = localStorage.getItem('license_session') || '';
+    if (!pretty || !sessionId) location.href = "index.html";
+    const keyId = pretty.replace(/-/g,'');
+
+    async function getDeviceId(){
+      const seed = [
+        navigator.userAgent, navigator.platform,
+        screen.width + 'x' + screen.height,
+        Intl.DateTimeFormat().resolvedOptions().timeZone || 'tz'
+      ].join('|');
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(seed));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    const TTL_MS = 90 * 1000;
+    async function guard(){
+      try{
+        const ref  = doc(db, 'license_keys', keyId);
+        const snap = await getDoc(ref);
+        if(!snap.exists()) return kick();
+        const data = snap.data();
+        if(data.revoked)  return kick();
+
+        const stored   = localStorage.getItem('device_id');
+        const deviceId = stored || await getDeviceId();
+        const lastSeen = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+        const fresh    = lastSeen && (Date.now() - lastSeen) <= TTL_MS;
+
+        const valid = data.activeDeviceId === deviceId && data.activeSessionId === sessionId && fresh;
+        if(!valid) return kick();
+
+        window.__hb = setInterval(async ()=>{ try{
+          await setDoc(ref,{ lastSeenAt: serverTimestamp() },{ merge:true });
+        }catch(_){ }}, 30000);
+        window.addEventListener('beforeunload',()=>clearInterval(window.__hb));
+      }catch(_){ kick(); }
+    }
+    function kick(){ location.href="index.html"; }
+    await guard();
+
+    /* ============== Render list bernomor (bonus 3, pain 5) ============== */
+    function renderNumberedInputs(containerId, count, cls){
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      for(let i=1;i<=count;i++){
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `
+          <div class="num">${i}</div>
+          <input class="${cls}" placeholder="Isi poin ${i}..." />
+        `;
+        el.appendChild(row);
+      }
+    }
+    renderNumberedInputs('bonusList', 3, 'bonus-input');
+    renderNumberedInputs('painList', 5, 'pain-input');
+
+    function collectLines(selector, n){
+      const vals = Array.from(document.querySelectorAll(selector)).map(el=>el.value.trim());
+      while(vals.length < n) vals.push('');
+      return vals.slice(0,n);
+    }
+
+    /* ============== Prompt builder sesuai brief ============== */
+    const $ = id => document.getElementById(id);
+
+    function buildPrompt(){
+      const nama = $('nama').value.trim();
+      const jenis = $('jenis').value;
+      const harga = $('harga').value.trim();
+      const diskonAda = $('diskonAda').value;
+      const diskonMenjadi = $('diskonMenjadi').value.trim();
+      const bonus = collectLines('.bonus-input', 3);
+      const refund = $('refund').value;
+
+      const persona = $('persona').value.trim();
+      const pain = collectLines('.pain-input', 5);
+      const desired = $('desired').value.trim();
+
+      const testi = $('testi').value;
+      const proof = [
+        $('bv_ba').checked ? 'Before–After' : '',
+        $('bv_sr').checked ? 'Screen record hasil' : '',
+        $('bv_ugc').checked ? 'UGC Testimonial' : ''
+      ].filter(Boolean);
+
+      const web = $('web').value;
+      const pg  = $('pg').value;
+      const pixel = $('pixel').value;
+      const wa  = $('wa').value;
+      const cs  = $('cs').value;
+      const csAdmin = $('csAdmin').value.trim();
+      const csSLA = $('csSLA').value;
+
+      const ret = $('ret').value;
+      const budget = $('budget').value;
+      const jalur = $('jalur').value;
+
+      const ringkasProduk = `
+Nama Produk: ${nama}
+Jenis Produk: ${jenis}
+Harga Jual (Rp): ${harga || '-'}
+Diskon: ${diskonAda}${diskonAda==='Ya' ? ` → ${diskonMenjadi || '-'}` : ''}
+Bonus/Tambahan: ${bonus.filter(Boolean).join(' | ') || '-'}
+Refund/Garansi: ${refund}
+
+Target Market singkat: ${persona || '-'}
+Pain Point Top 5:
+1) ${pain[0]||''}
+2) ${pain[1]||''}
+3) ${pain[2]||''}
+4) ${pain[3]||''}
+5) ${pain[4]||''}
+Desired Outcome: ${desired || '-'}
+
+Bukti Sosial:
+• Testimoni: ${testi}
+• Bukti Visual: ${proof.join(', ') || '-'}
+
+Infrastruktur:
+• Website/Checkout: ${web}
+• Payment Gateway: ${pg}
+• Pixel Meta: ${pixel}
+• WhatsApp Business: ${wa}
+• CS: ${cs}${cs==='Ya' ? ` (admin: ${csAdmin||'-'}, SLA: ${csSLA})` : ''}
+
+Tujuan & Budget:
+• Target pengembalian: ${ret}
+• Budget harian: ${budget}
+• Prefer jalur awal: ${jalur}
+`.trim();
+
+      // Prompt custom (sudah dirapikan agar output rapi)
+      return `
+Bro Gua Punya Produk (data form di bawah). Tolong analisis funnel dan berikan output sesuai format berikut.
+
+============ DATA FORM (RINGKAS) ============
+${ringkasProduk}
+
+============ YANG DIMINTA ============
+
+A) Rekomendasi Funnel Card
+- Pilihan: CTWA / LP→Checkout / Checkout-only
+- Alasan (3–5 poin) berbasis jawaban form
+- Checklist eksekusi (apa yang harus disiapkan hari ini)
+
+B) Blueprint Meta Ads (siap jalan)
+• CTWA (untuk pemula tanpa website/pixel)
+  Objective: Messaging → WhatsApp
+  Struktur: 2 ad set (Broad 18–44 + Interest tunggal relevan), Advantage+ placements
+  Kreatif: 3–5 video pendek (9:16) + 1–2 gambar; CTA “Kirim pesan”
+  KPI awal: pantau Cost per Messaging Conversation & % chat dijawab
+  Operasional: template auto-reply, skrip tanya-jawab, link bayar cepat
+
+• LP → Checkout (kalau web + pixel siap)
+  Objective: Sales (Website), optimisasi awal InitiateCheckout (minggu 1), lalu Purchase
+  Struktur: 2–3 ad set (Broad, 1 Interest stack, Lookalike kalau ada data), 3–5 kreatif/ad set
+  KPI awal: CTR link ≥ 1%, kecepatan LP bagus, form pembayaran lancar
+
+• Checkout-only (impulse, murah)
+  Objective: Sales (Website) (Purchase/IC), 1-page checkout
+  Tambah order bump (ringan), trust badge + FAQ singkat
+
+C) Rencana 14 Hari (pemula)
+Day 0: siapkan aset (Page/WA, payment, pixel kalau perlu), 3–5 kreatif
+Day 1–2: launch 2 ad set, budget sesuai pilihan (mis. 100k–200k/hari total)
+Day 3: matikan kreatif CTR buruk, duplikasi yang oke
+Day 4–7: tambah 2 angle baru (Proof & Mechanism), rapikan FAQ/skrip CS
+Day 8–10: scale +20–30% jika KPI on track
+Day 11–14: remarketing ringan (viewers/engagers), iterasi CTA
+
+D) Paket Kreatif 7 Hari (auto-generate)
+- 6 Hook anti-skip: Pain, Proof, Mechanism, Before–After, Objection Killer, UGC Testi
+- Format: 9:16 (utama) + 1:1
+- Copy CTA otomatis menyesuaikan funnel:
+  CTWA: “Chat Admin buat cek cocoknya & ambil bonus”
+  LP: “Lihat detail & bonus di halaman”
+  Checkout: “Beli sekarang – akses otomatis”
+
+E) Skrip Chat WA (kalau CTWA)
+- Auto-reply pembuka + 3 pertanyaan kualifikasi (pain, tujuan, budget)
+- Pitch singkat sesuai jawaban + kirim link bayar / LP
+- Follow-up otomatis H+1 (belum bayar) & H+3 (testi/bonus penutup)
+
+Default KPI & Budget (buat pemula)
+- Start 100k–200k/hari total (1–2 ad set, 3–5 kreatif).
+- Fokus indikator mudah dulu:
+  CTWA: banyaknya chat masuk, balasan <5 menit, % chat → closing.
+  LP/Checkout: CTR link, tambah ke keranjang, jalan sampai pembayaran.
+- Jangan ubah banyak hal dalam 24 jam pertama; evaluasi harian, tuning di hari ke-3.
+
+Output wajib rapi, pakai heading & poin-poin jelas.
+`.trim();
+    }
+
+    document.getElementById('btnGen').addEventListener('click', ()=>{
+      const prompt = buildPrompt();
+      const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+      // buka tab
+      window.open(url,'_blank');
+      // tombol fallback
+      const open = document.getElementById('openGPT');
+      open.href = url; open.style.display = 'inline-flex';
+      open.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  </script>
+</body>
+</html>

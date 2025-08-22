@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activate License</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#0b0c10; --panel:#111217; --text:#fff; --muted:#c7c7c7; --blue:#3a9eff; --blue-soft:rgba(58,158,255,.5); }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(58,158,255,.15), transparent 50%),
+      radial-gradient(1000px 700px at -10% 110%, rgba(58,158,255,.12), transparent 60%),var(--bg);
+      color:var(--text);font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;
+      display:grid;place-items:center;padding:24px}
+    .wrap{width:100%;max-width:clamp(340px,92vw,620px);text-align:center}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0)),var(--panel);
+      border:1px solid rgba(58,158,255,.4);box-shadow:0 20px 60px -25px rgba(0,0,0,.6),0 10px 30px -20px var(--blue-soft);
+      border-radius:18px;padding:clamp(16px,3vw,26px);backdrop-filter:blur(6px)}
+    .card{padding:clamp(14px,2.8vw,22px);border-radius:14px;background:rgba(255,255,255,.01);border:1px solid rgba(58,158,255,.35)}
+    h2{margin:0 0 10px;font-size:clamp(18px,2.4vw,22px);font-weight:600;color:var(--blue);text-align:center}
+    .sub{margin:6px 0 18px;color:var(--muted);font-size:clamp(12px,1.6vw,14px)}
+    .input{display:grid;grid-template-columns:1fr auto;gap:10px;width:100%;align-items:center}
+    .input input{width:100%;background:#0c0d12;color:var(--text);border:1px solid rgba(58,158,255,.6);border-radius:12px;
+      padding:clamp(12px,2.2vw,14px) 14px;font-size:clamp(14px,1.8vw,16px);outline:none;box-shadow:0 0 0 2px rgba(58,158,255,.25);transition:.2s}
+    .input input:focus{border-color:var(--blue);box-shadow:0 0 8px var(--blue-soft)}
+    .btn{appearance:none;border:none;cursor:pointer;width:100%;background:linear-gradient(180deg,rgba(58,158,255,.3),rgba(58,158,255,.2));
+      color:var(--text);font-weight:600;letter-spacing:.3px;border:1px solid var(--blue);border-radius:12px;
+      padding:clamp(12px,2.2vw,14px) 16px;font-size:clamp(14px,1.8vw,16px);box-shadow:0 8px 25px -8px var(--blue-soft),0 0 8px rgba(58,158,255,.3);transition:.2s}
+    .btn:hover{box-shadow:0 14px 34px -12px var(--blue-soft),0 0 12px rgba(58,158,255,.45)} .btn:active{transform:translateY(1px)}
+    .status{border-radius:12px;padding:12px 14px;font-size:clamp(13px,1.8vw,14px);line-height:1.5;border:1px solid rgba(58,158,255,.5);background:rgba(58,158,255,.12);margin-top:12px}
+    .hint{font-size:clamp(11px,1.6vw,13px);color:var(--muted);margin-top:8px}
+    .foot{margin-top:20px;color:var(--muted);font-size:11px;text-align:center}
+    @media (max-width:560px){ .input{grid-template-columns:1fr} } @media (min-width:1024px){ .wrap{max-width:680px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="card">
+        <h2>License Activation</h2>
+        <p class="sub">Masukkan <b>license key</b> kamu untuk mengaktifkan akses.</p>
+        <div class="input">
+          <input id="licenseInput" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="one-time-code" />
+          <button id="btnActivate" class="btn">Aktifkan</button>
+        </div>
+        <div class="hint">Contoh format: ABCD-1234-EFGH-5678</div>
+        <div id="statusBox" class="status" aria-live="polite">Status: menunggu input…</div>
+        <div class="hint">Device ID akan direkam untuk mencegah penyalahgunaan license.</div>
+      </div>
+    </div>
+    <p class="foot">© <span id="year"></span> cumapake.ai</p>
+  </div>
+
+  <script type="module">
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+      authDomain: "tools-ad-wise.firebaseapp.com",
+      projectId: "tools-ad-wise",
+      storageBucket: "tools-ad-wise.firebasestorage.app",
+      messagingSenderId: "754326218173",
+      appId: "1:754326218173:web:7fe33f473e72b934071ed4",
+      measurementId: "G-YYNPSL3BDS"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const $ = id => document.getElementById(id);
+    const licenseInput = $('licenseInput');
+    const statusBox    = $('statusBox');
+    $('year').textContent = new Date().getFullYear();
+    const setStatus = (m)=> statusBox.textContent = m;
+
+    function normKey(raw){ return (raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(.{4})/g,'$1-').replace(/-$/,''); }
+    async function sha256(t){ const enc=new TextEncoder(); const buf=await crypto.subtle.digest('SHA-256',enc.encode(t));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function getDeviceId(){
+      const seed=[navigator.userAgent,navigator.platform,screen.width+'x'+screen.height,Intl.DateTimeFormat().resolvedOptions().timeZone||'tz'].join('|');
+      return sha256(seed);
+    }
+
+    licenseInput.addEventListener('input', ()=>{
+      const pos=licenseInput.selectionStart; licenseInput.value = normKey(licenseInput.value);
+      licenseInput.selectionStart = licenseInput.selectionEnd = pos;
+    });
+    licenseInput.addEventListener('keydown', e=>{ if(e.key==='Enter') activate(); });
+    $('btnActivate').addEventListener('click', activate);
+
+    // ====== AKTIVASI: TTL 90s, take-over, tanpa kunci device permanen ======
+    async function activate(){
+      try{
+        const pretty = normKey(licenseInput.value.trim());
+        if(!pretty){ setStatus('Masukkan license key terlebih dahulu.'); licenseInput.focus(); return; }
+
+        setStatus('🔒 Mengecek license di database…');
+        const keyId = pretty.replace(/-/g,'');
+        const ref = doc(db,'license_keys',keyId);
+        const snap = await getDoc(ref);
+        if(!snap.exists()){ setStatus('❌ License tidak ditemukan.'); return; }
+
+        const data = snap.data();
+        if(data.revoked){ setStatus('⛔ License ini telah dicabut.'); return; }
+
+        const deviceId = await getDeviceId();
+        localStorage.setItem('device_id', deviceId);
+
+        // hanya cek sesi aktif + TTL
+        const now = Date.now();
+        const ttlMs = 90 * 1000;
+        const lastSeen = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+        const expired  = !lastSeen || (now - lastSeen) > ttlMs;
+
+        if (data.activeDeviceId && data.activeSessionId && !expired && data.activeDeviceId !== deviceId) {
+          setStatus('⚠️ License sedang dipakai di perangkat lain. Coba lagi setelah user tsb sign out / tunggu ±90 detik.');
+          return;
+        }
+
+        // set sesi aktif (lifetime, tidak kunci device permanen)
+        const sessionId = crypto.randomUUID();
+        await setDoc(ref, {
+          used: true,
+          activeDeviceId: deviceId,
+          activeSessionId: sessionId,
+          activeSince: serverTimestamp(),
+          lastSeenAt: serverTimestamp(),
+          lastCheckAt: serverTimestamp()
+        }, { merge:true });
+
+        localStorage.setItem('license_pretty', pretty);
+        localStorage.setItem('license_session', sessionId);
+
+        setStatus('✅ Aktivasi berhasil!');
+        setTimeout(()=> location.href = "AdWise Tools.html", 700);
+      }catch(err){
+        console.error(err);
+        setStatus('🚨 Terjadi kesalahan saat aktivasi: ' + (err?.code ? `${err.code}: ${err.message}` : String(err)));
+      }
+    }
+
+    setTimeout(()=>licenseInput.focus(), 200);
+  </script>
+</body>
+</html>

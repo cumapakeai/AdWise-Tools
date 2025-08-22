@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Creative Ads</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#101318; --ink:#ffffff; --muted:#b7c0cc;
+      --blue:#3a9eff; --line:rgba(58,158,255,.35);
+    }
+    body{margin:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--ink)}
+    .container{max-width:900px;margin:36px auto;padding:0 20px}
+    h1{font-size:22px;color:var(--blue);margin-bottom:18px}
+    .section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px}
+    label{font-size:14px;color:var(--muted)}
+    input,textarea{
+      width:100%;background:#0c0f14;color:var(--ink);border:1px solid var(--line);
+      border-radius:10px;padding:10px 12px;font-size:14px;margin-top:6px;margin-bottom:12px
+    }
+    textarea{min-height:80px;resize:vertical}
+    .btn{
+      display:block;width:100%;padding:12px;margin-bottom:12px;
+      border-radius:10px;border:1px solid var(--blue);
+      background:linear-gradient(180deg, rgba(58,158,255,.32), rgba(58,158,255,.2));
+      color:#fff;font-weight:600;cursor:pointer;text-align:center;
+      box-shadow:0 10px 24px -14px rgba(58,158,255,.35);
+    }
+    .btn:hover{box-shadow:0 0 12px rgba(58,158,255,.6)}
+    .footerBtns{display:grid;grid-template-columns:1fr 160px;gap:12px;margin-top:20px}
+    @media(max-width:600px){.footerBtns{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📘 Data Produk</h1>
+    <div class="section">
+      <label>Nama Produk</label>
+      <input id="nama" placeholder="cth: E-Book 7 Hari Bisa Ngonten"/>
+      <label>Deskripsi Produk</label>
+      <textarea id="desk" placeholder="Deskripsi singkat produk"></textarea>
+      <label>Target Market (maks 10, pisahkan Enter)</label>
+      <textarea id="tm"></textarea>
+      <label>Value (maks 10, pisahkan Enter)</label>
+      <textarea id="val"></textarea>
+      <label>Keunikan Produk</label>
+      <textarea id="uniq"></textarea>
+    </div>
+
+    <h1>🎯 Generate Creative Ads</h1>
+    <div class="section">
+      <button class="btn" onclick="go(0)">Create Creative Angle PAS</button>
+      <button class="btn" onclick="go(1)">Create Creative Angle Before After</button>
+      <button class="btn" onclick="go(2)">Create Creative Angle Testimoni</button>
+      <button class="btn" onclick="go(3)">Create Creative Angle Edukasi Singkat</button>
+      <button class="btn" onclick="go(4)">Create Creative Angle Urgency</button>
+      <button class="btn" onclick="go(5)">Create Creative Angle Lifestyle</button>
+      <button class="btn" onclick="go(6)">Create Creative Angle Storytelling</button>
+    </div>
+
+    <!-- Tambahan Tombol -->
+    <div class="section">
+      <button class="btn" onclick="location.href='https://docs.google.com/document/d/1ulWMIVTctCgdDW76qLqrPJ1exfgS4uz6lztulByrbZQ/edit?usp=drive_link'">📑 Contoh Creative Ads yang akan di create</button>
+      <button class="btn" onclick="location.href='https://docs.google.com/document/d/1_4fCrzP31G5vYxDolj-CJM7tU60b6bmeaarTWkwshvQ/edit?usp=drive_link'">📥 Paste Create Ads Disini</button>
+    </div>
+
+    <div class="footerBtns">
+      <div></div>
+      <button class="btn" onclick="location.href='AdWise Tools.html'">⬅️ Back</button>
+    </div>
+  </div>
+
+  <script type="module">
+  // ===== Firebase config punyamu =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+    authDomain: "tools-ad-wise.firebaseapp.com",
+    projectId: "tools-ad-wise"
+  };
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ===== Guard lisensi =====
+  const pretty    = localStorage.getItem('license_pretty') || '';
+  const sessionId = localStorage.getItem('license_session') || '';
+  if (!pretty || !sessionId) {
+    location.href = "index.html";
+  }
+  const keyId = pretty.replace(/-/g,'');
+
+  async function getDeviceId(){
+    const seed = [
+      navigator.userAgent,
+      navigator.platform,
+      screen.width + 'x' + screen.height,
+      Intl.DateTimeFormat().resolvedOptions().timeZone || 'tz'
+    ].join('|');
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(seed));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  const TTL_MS = 90 * 1000;
+
+  async function guard(){
+    try{
+      const ref  = doc(db, 'license_keys', keyId);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){ return kick(); }
+
+      const data = snap.data();
+      if(data.revoked){ return kick(); }
+
+      const stored   = localStorage.getItem('device_id');
+      const deviceId = stored || await getDeviceId();
+
+      const lastSeenMs = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+      const fresh      = lastSeenMs && (Date.now() - lastSeenMs) <= TTL_MS;
+
+      const valid = data.activeDeviceId === deviceId &&
+                    data.activeSessionId === sessionId &&
+                    fresh;
+
+      if(!valid){ return kick(); }
+
+      window.__hb = setInterval(async ()=>{
+        try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}
+      }, 30000);
+
+      window.addEventListener('beforeunload', ()=>{ clearInterval(window.__hb); });
+    }catch(_){
+      kick();
+    }
+  }
+
+  function kick(){ location.href = "index.html"; }
+
+  await guard();
+
+  // ================== Logic tombol kreatif ==================
+  const angles = [
+    "Problem → Agitasi → Solusi (Pain Point Based)",
+    "Transformasi / Before After",
+    "Testimoni / Social Proof",
+    "Value Nugget (Edukasi Singkat)",
+    "Urgency & Scarcity",
+    "Lifestyle / Aspirational",
+    "Relatable Storytelling"
+  ];
+
+  function toTen(txt){
+    const arr=(txt||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,10);
+    while(arr.length<10) arr.push('');
+    return arr;
+  }
+
+  function buildPrompt(idx){
+    const nama = document.getElementById('nama').value.trim();
+    const desk = document.getElementById('desk').value.trim();
+    const tm   = toTen(document.getElementById('tm').value);
+    const val  = toTen(document.getElementById('val').value);
+    const uniq = document.getElementById('uniq').value.trim();
+
+    return `Halo Bro Gua Punya Produk "${nama}"
+Sedikit Deskripsi Tentang Produk Gua "${desk}"
+Produk Gua Itu Target Marketnya Yaitu :
+1. ${tm[0]}
+2. ${tm[1]}
+3. ${tm[2]}
+4. ${tm[3]}
+5. ${tm[4]}
+6. ${tm[5]}
+7. ${tm[6]}
+8. ${tm[7]}
+9. ${tm[8]}
+10. ${tm[9]}
+dan produk gua memiliki beberapa value yaitu :
+1. ${val[0]}
+2. ${val[1]}
+3. ${val[2]}
+4. ${val[3]}
+5. ${val[4]}
+6. ${val[5]}
+7. ${val[6]}
+8. ${val[7]}
+9. ${val[8]}
+10. ${val[9]}
+serta keunikan produk gua dari produk yang sudah ada di pasaran ialah "${uniq}"
+
+Gua mau lo buatin gua script untuk koten video dengan struktur hook, bridging, isi, value dan CTA gunakan hook yang sangat nancep pada audience shingga konten ini meskipun audience tau tapi tetap tidak mau skip dengan hook yang nancep serta bridging yang semakin membuat audience semakin tidak mau skip begitupun dengan isi serta buat value itu menjelaskan value dari produk gua yang sudah ada diatas, buat sebisa mungkin orang yang nonton merasa value produk ini melebihi ketimbang harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat woerth it, serta buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
+
+Tidak hanya script video bro gua mau lo juga  buatin gua copywriting iklan yang terdiri dari headline, primary text, CTA Button.
+
+gua mau lo buat 3 variasi script video untuk konten iklan dan 3 variasi copywriting iklan
+
+gua mau lo buatin gua dari angle ${angles[idx]}`;
+  }
+
+  window.go = function(idx){
+    const prompt = buildPrompt(idx);
+    const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+    window.open(url, '_blank');
+  };
+  </script>
+</body>
+</html>

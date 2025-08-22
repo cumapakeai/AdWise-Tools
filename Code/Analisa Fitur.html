@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analisa Fitur & Keunggulan Produk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#0f1217; --ink:#ffffff; --muted:#b7c0cc;
+      --blue:#3a9eff; --line:rgba(58,158,255,.28); --panel-2:#0c0f14;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:
+        radial-gradient(1100px 900px at 110% -10%, rgba(58,158,255,.08), transparent 55%),
+        radial-gradient(900px 700px at -10% 110%, rgba(58,158,255,.08), transparent 60%),
+        var(--bg);
+      font-family:'Poppins',sans-serif; color:var(--ink);
+    }
+    .wrap{max-width:980px; margin:36px auto; padding:0 22px}
+    .head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+    h1{margin:0;font-size:22px;color:var(--blue)}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--panel);
+      border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:18px;
+      box-shadow:0 18px 40px -26px rgba(0,0,0,.6);
+    }
+    .grid{display:grid; gap:14px}
+    .grid.two{grid-template-columns:1fr}
+    @media(min-width:820px){ .grid.two{grid-template-columns:1fr 1fr} }
+    .field{display:flex;flex-direction:column;gap:8px}
+    .label{font-size:13px;color:var(--muted)}
+    input, textarea, select{
+      width:100%; background:var(--panel-2); color:var(--ink); border:1px solid var(--line);
+      border-radius:12px; padding:12px 14px; font-size:14px; outline:none; transition:border .15s, box-shadow .15s;
+    }
+    input:focus, textarea:focus, select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,158,255,.18)}
+    textarea{min-height:96px; resize:vertical}
+    .hint{font-size:12px;color:var(--muted);margin-top:-6px}
+
+    /* List bernomor */
+    .list{display:grid; gap:8px}
+    .row{
+      display:grid; grid-template-columns: 34px 1fr; gap:8px; align-items:center;
+    }
+    .num{
+      width:34px; height:40px; display:flex; align-items:center; justify-content:center;
+      border:1px solid var(--line); border-radius:10px; background:#0a0d12; color:var(--muted);
+      font-weight:600;
+    }
+    .row input{
+      height:40px; padding:0 12px;
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+      border:1px solid var(--blue); color:#fff; font-weight:700; padding:14px 16px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(58,158,255,.34), rgba(58,158,255,.22));
+      box-shadow:0 16px 36px -18px rgba(58,158,255,.35);
+      cursor:pointer; text-decoration:none; transition:transform .06s, box-shadow .2s;
+    }
+    .btn:hover{box-shadow:0 0 16px rgba(58,158,255,.55)}
+    .btn:active{transform:translateY(1px)}
+    .btn-row{display:grid;grid-template-columns:1fr auto; gap:14px; margin-top:6px}
+    @media(max-width:640px){ .btn-row{grid-template-columns:1fr}}
+    .btn-open{display:none; margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head"><span class="dot"></span><h1>Analisa Fitur & Keunggulan Produk</h1></div>
+
+    <div class="card">
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="nama">Nama Produk</label>
+          <input id="nama" placeholder="cth: E-Book 7 Hari Bisa Ngonten"/>
+        </div>
+
+        <div class="field">
+          <label class="label" for="desk">Deskripsi Produk</label>
+          <textarea id="desk" placeholder="Deskripsi singkat produk"></textarea>
+        </div>
+
+        <div class="grid two">
+          <div class="field">
+            <label class="label" for="kategori">Kategori Produk</label>
+            <select id="kategori">
+              <option value="Fisik">Fisik</option>
+              <option value="Digital">Digital</option>
+              <option value="Jasa">Jasa</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="harga">Harga / Range Harga (Rp)</label>
+            <input id="harga" placeholder="cth: Rp100.000 – Rp300.000"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="tm">Target Market (demografi & psikografi)</label>
+          <textarea id="tm" placeholder="Contoh: Remaja 18–24, suka konten edukasi, aktif di TikTok"></textarea>
+        </div>
+
+        <div class="grid two">
+          <div class="field">
+            <label class="label">Problem Utama Customer (maks 10)</label>
+            <div class="list" id="listProblem"></div>
+            <div class="hint">Tips: 1 baris = 1 problem</div>
+          </div>
+          <div class="field">
+            <label class="label">Benefit Utama Produk (maks 10)</label>
+            <div class="list" id="listBenefit"></div>
+            <div class="hint">Tips: 1 baris = 1 benefit</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnGen" class="btn">🔎 Analisa Produk Sekarang</button>
+        <button class="btn" onclick="location.href='AdWise Tools.html'">⬅️ Back</button>
+      </div>
+      <a id="openGPT" class="btn btn-open" target="_blank">➡️ Buka Analisa di GPT</a>
+    </div>
+  </div>
+
+  <script type="module">
+    /* ============== Guard lisensi + heartbeat ============== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+      authDomain: "tools-ad-wise.firebaseapp.com",
+      projectId: "tools-ad-wise"
+    };
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const pretty    = localStorage.getItem('license_pretty') || '';
+    const sessionId = localStorage.getItem('license_session') || '';
+    if (!pretty || !sessionId) location.href = "index.html";
+    const keyId = pretty.replace(/-/g,'');
+
+    async function getDeviceId(){
+      const seed = [
+        navigator.userAgent, navigator.platform,
+        screen.width + 'x' + screen.height,
+        Intl.DateTimeFormat().resolvedOptions().timeZone || 'tz'
+      ].join('|');
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(seed));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    const TTL_MS = 90 * 1000;
+    async function guard(){
+      try{
+        const ref  = doc(db, 'license_keys', keyId);
+        const snap = await getDoc(ref);
+        if(!snap.exists()) return kick();
+        const data = snap.data();
+        if(data.revoked)  return kick();
+
+        const stored   = localStorage.getItem('device_id');
+        const deviceId = stored || await getDeviceId();
+        const lastSeen = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+        const fresh    = lastSeen && (Date.now() - lastSeen) <= TTL_MS;
+
+        const valid = data.activeDeviceId === deviceId && data.activeSessionId === sessionId && fresh;
+        if(!valid) return kick();
+
+        window.__hb = setInterval(async ()=>{ try{
+          await setDoc(ref,{ lastSeenAt: serverTimestamp() },{ merge:true });
+        }catch(_){ }}, 30000);
+        window.addEventListener('beforeunload',()=>clearInterval(window.__hb));
+      }catch(_){ kick(); }
+    }
+    function kick(){ location.href="index.html"; }
+    await guard();
+
+    /* ============== Render 10 baris bernomor otomatis ============== */
+    const listProblem = document.getElementById('listProblem');
+    const listBenefit = document.getElementById('listBenefit');
+
+    function renderNumberedInputs(container, cls){
+      container.innerHTML = '';
+      for(let i=1;i<=10;i++){
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `
+          <div class="num">${i}</div>
+          <input class="line ${cls}" placeholder="Isi poin ${i}..." />
+        `;
+        container.appendChild(row);
+      }
+    }
+    renderNumberedInputs(listProblem, 'prob-input');
+    renderNumberedInputs(listBenefit, 'benefit-input');
+
+    /* helper ambil 10 nilai */
+    function collectLines(selector){
+      const vals = Array.from(document.querySelectorAll(selector))
+        .map(el=>el.value.trim());
+      while(vals.length < 10) vals.push('');
+      return vals.slice(0,10);
+    }
+
+    /* ============== Prompt builder ============== */
+    const $ = id => document.getElementById(id);
+    $('btnGen').addEventListener('click', ()=>{
+      const nama = $('nama').value.trim();
+      const desk = $('desk').value.trim();
+      const kategori = $('kategori').value;
+      const harga = $('harga').value.trim();
+      const tm    = $('tm').value.trim();
+      const prob  = collectLines('.prob-input');
+      const ben   = collectLines('.benefit-input');
+
+      const prompt = `
+Bro gua punya produk "${kategori}" nama produknya ialah "${nama}"
+Produknya yaitu tentang "${desk}"
+
+range harga dari produk gua yaitu "${harga}"
+dan target market gua yaitu: "${tm}"
+
+dan produk gua ini menyelesaikan masalah :
+1. ${prob[0]}
+2. ${prob[1]}
+3. ${prob[2]}
+4. ${prob[3]}
+5. ${prob[4]}
+6. ${prob[5]}
+7. ${prob[6]}
+8. ${prob[7]}
+9. ${prob[8]}
+10. ${prob[9]}
+"diambil dari Problem utama customer".
+
+produk gua juga memeliki beberapa benefit yaitu:
+1. ${ben[0]}
+2. ${ben[1]}
+3. ${ben[2]}
+4. ${ben[3]}
+5. ${ben[4]}
+6. ${ben[5]}
+7. ${ben[6]}
+8. ${ben[7]}
+9. ${ben[8]}
+10. ${ben[9]}
+"diambil dari Benefit utama produk"
+
+gua mau lo analisa Target Market, Value Produk, keunikan produk dan fitur produk, lo bisa analisa dari data yang gua kasih bro.
+      `.trim();
+
+      const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+      const openBtn = document.getElementById('openGPT');
+      openBtn.href = url;
+      openBtn.style.display = 'inline-flex';
+      openBtn.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  </script>
+</body>
+</html>

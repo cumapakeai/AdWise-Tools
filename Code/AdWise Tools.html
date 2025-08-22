@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial + Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#0b0c10; --panel:#111217; --text:#fff; --muted:#c7c7c7; --blue:#3a9eff; --blue-soft:rgba(58,158,255,.5); }
+    *{box-sizing:border-box}
+    body{ margin:0;background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;min-height:100vh; }
+    header{ width:100%;max-width:900px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px; }
+    .title{font-size:18px;font-weight:600;color:var(--blue)}
+    .signout{background:transparent;border:1px solid var(--blue);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:500;transition:.2s}
+    .signout:hover{background:rgba(58,158,255,.15)}
+    .video{width:100%;max-width:900px;aspect-ratio:16/9;margin-bottom:30px;border-radius:14px;overflow:hidden;box-shadow:0 15px 40px -20px var(--blue-soft)}
+    iframe{width:100%;height:100%;border:0}
+    .buttons{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));width:100%;max-width:900px}
+    .btn{background:linear-gradient(180deg,rgba(58,158,255,.3),rgba(58,158,255,.2));color:var(--text);font-weight:600;border:1px solid var(--blue);border-radius:12px;padding:16px;text-align:center;text-decoration:none;font-size:16px;box-shadow:0 8px 20px -8px var(--blue-soft);transition:.2s}
+    .btn:hover{box-shadow:0 14px 34px -12px var(--blue-soft),0 0 12px rgba(58,158,255,.45)} .btn:active{transform:translateY(1px)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">AdWise Tools</div>
+    <button class="signout" id="btnSignOut">Sign Out</button>
+  </header>
+
+  <div class="video">
+    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
+  </div>
+
+  <div class="buttons">
+    <a href="analisis iklan.html" class="btn">Analisis Data Ikaln</a>
+    <a href="Creative Ads Generator.html" class="btn">Ads Creative Generator</a>
+    <a href="Analisa Fitur.html" class="btn">Analisis Fitur dan keunggulan produk</a>
+    <a href="Analisis Funnel.html" class="btn">Analisis Funnel Berikalan</a>
+    <a href="Create Creative LP.html" class="btn">Create Copywriting Landing Page</a>
+  </div>
+
+  <script type="module">
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
+      authDomain: "tools-ad-wise.firebaseapp.com",
+      projectId: "tools-ad-wise"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // Guard awal: wajib punya key & session
+    const pretty    = localStorage.getItem('license_pretty') || '';
+    const sessionId = localStorage.getItem('license_session') || '';
+    if(!pretty || !sessionId){ location.href = "index.html"; }
+    const keyId = pretty.replace(/-/g,'');
+
+    async function sha256(t){ const enc=new TextEncoder(); const buf=await crypto.subtle.digest('SHA-256',enc.encode(t));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function getDeviceId(){
+      // algoritma sama persis dengan halaman aktivasi
+      const seed=[navigator.userAgent,navigator.platform,screen.width+'x'+screen.height,Intl.DateTimeFormat().resolvedOptions().timeZone||'tz'].join('|');
+      return sha256(seed);
+    }
+
+    const ttlMs = 90 * 1000;
+
+    async function verifyAndStartHeartbeat(){
+      const ref = doc(db,'license_keys',keyId);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){ location.href = "index.html"; return; }
+      const data = snap.data();
+      if(data.revoked){ location.href = "index.html"; return; }
+
+      // pakai device_id tersimpan, fallback hitung ulang
+      const stored = localStorage.getItem('device_id');
+      const deviceId = stored || await getDeviceId();
+
+      const lastSeenMs = data.lastSeenAt?.toMillis ? data.lastSeenAt.toMillis() : (data.lastSeenAt || 0);
+      const isFresh    = !lastSeenMs || (Date.now() - lastSeenMs) <= ttlMs;
+
+      const valid = data.activeDeviceId === deviceId && data.activeSessionId === sessionId && isFresh;
+      if(!valid){ location.href = "index.html"; return; }
+
+      // heartbeat setiap 30 detik
+      window.__hb = setInterval(async ()=>{
+        try{ await setDoc(ref,{ lastSeenAt: serverTimestamp() },{ merge:true }); }catch(e){/* ignore */}
+      }, 30000);
+
+      // lepas sesi saat tab ditutup
+      window.addEventListener('beforeunload', async ()=>{
+        try{
+          const s = await getDoc(ref); const d = s.data();
+          if(d && d.activeSessionId === sessionId){
+            await setDoc(ref,{ activeDeviceId:null, activeSessionId:null, lastSeenAt: serverTimestamp() },{ merge:true });
+          }
+        }catch(e){}
+        clearInterval(window.__hb);
+      });
+    }
+    verifyAndStartHeartbeat();
+
+    // Sign out manual (langsung lepas kunci)
+    document.getElementById('btnSignOut').addEventListener('click', async ()=>{
+      try{
+        const ref = doc(db,'license_keys',keyId);
+        await setDoc(ref,{ activeDeviceId:null, activeSessionId:null, lastSeenAt: serverTimestamp() },{ merge:true });
+      }catch(e){ console.error(e); }
+      localStorage.removeItem('license_pretty');
+      localStorage.removeItem('license_session');
+      localStorage.removeItem('device_id');
+      location.href = "Login - AdWise.html";
+    });
+  </script>
+</body>
+</html>
