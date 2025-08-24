@@ -11,8 +11,8 @@
     :root{
       --bg:#0b0c10; --panel:#111217; --ink:#ffffff; --muted:#b7c0cc;
       --blue:#3a9eff; --line:rgba(58,158,255,.35);
-      --deep1:#1e3c72; /* deep elegant blue start */
-      --deep2:#2a5298; /* deep elegant blue end */
+      --deep1:#1e3c72; 
+      --deep2:#2a5298; 
     }
     *{box-sizing:border-box}
     body{
@@ -27,7 +27,6 @@
     .video{width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;box-shadow:0 18px 46px -24px rgba(0,0,0,.7), 0 8px 20px -10px rgba(58,158,255,.28);border:1px solid rgba(143,195,255,.22)}
     iframe{width:100%;height:100%;border:0}
 
-    /* Grid tombol tools */
     .buttons{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));width:100%;margin-top:18px}
     .btn{
       display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;
@@ -38,34 +37,22 @@
     .btn:hover{box-shadow:0 18px 40px -18px rgba(58,158,255,.5),0 0 12px rgba(58,158,255,.35)}
     .btn:active{transform:translateY(1px)}
 
-    /* Tombol Bonus biru elegan (di bawah tools) */
-    .btn-bonus{
+    .btn-bonus, .btn-join{
       display:block;width:100%;margin:18px auto 0 auto;padding:18px 20px;border-radius:14px;
       background:linear-gradient(135deg,var(--deep1),var(--deep2));
       border:1px solid rgba(255,255,255,.14); color:#fff; font-weight:700; letter-spacing:.2px;
       text-align:center; text-decoration:none; font-size:17px; position:relative; overflow:hidden;
       box-shadow:0 8px 24px -14px rgba(30,60,114,0.55);
       transition:transform .2s ease, box-shadow .3s ease;
-      /* Glow halus setiap 20 detik */
       animation:glowPulse 20s infinite;
     }
-    .btn-bonus:hover{transform:translateY(-2px); box-shadow:0 14px 42px -18px rgba(30,60,114,0.65)}
-    .btn-bonus span{opacity:.96}
+    .btn-bonus:hover, .btn-join:hover{transform:translateY(-2px); box-shadow:0 14px 42px -18px rgba(30,60,114,0.65)}
 
-    /* Glow hanya di akhir siklus biar elegan, lalu kembali normal */
     @keyframes glowPulse{
-      0%, 96%, 100%{
-        box-shadow:0 8px 24px -14px rgba(30,60,114,0.55);
-      }
-      97%, 99%{
-        box-shadow:
-          0 0 26px rgba(58,158,255,0.85),
-          0 0 64px rgba(58,158,255,0.55),
-          0 0 96px rgba(58,158,255,0.35);
-      }
+      0%, 96%, 100%{ box-shadow:0 8px 24px -14px rgba(30,60,114,0.55); }
+      97%, 99%{ box-shadow:0 0 26px rgba(58,158,255,0.85),0 0 64px rgba(58,158,255,0.55),0 0 96px rgba(58,158,255,0.35); }
     }
 
-    /* layout spacing */
     .stack{display:flex;flex-direction:column;gap:16px}
   </style>
 </head>
@@ -77,11 +64,9 @@
 
   <div class="stage stack">
     <div class="video">
-      <!-- ganti src YouTube tutorial kamu bila perlu -->
       <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Tutorial Video" allowfullscreen></iframe>
     </div>
 
-    <!-- Grid tombol tools -->
     <div class="buttons">
       <a href="analisis iklan.html" class="btn">Analisis Data Iklan</a>
       <a href="Creative Ads Generator.html" class="btn">Ads Creative Generator</a>
@@ -90,20 +75,17 @@
       <a href="Create Creative LP.html" class="btn">Copywriting Landing Page</a>
     </div>
 
-    <!-- Tombol Bonus (di bawah tools) -->
-    <a
-      class="btn-bonus"
-      href="https://sesuaiformat.notion.site/Akses-Digital-Licence-Masterkit-21615115020e80f0a38df3fd0f37a173"
-      target="_blank" rel="noopener noreferrer"
-      aria-label="Akses Bonus 400+ Produk Digital Senilai 299.000"
-    >
-      <span>🎁 Akses Bonus 400+ Produk Digital Senilai 299.000 (Design elegan biru match)</span>
+    <a class="btn-bonus" href="https://sesuaiformat.notion.site/Akses-Digital-Licence-Masterkit-21615115020e80f0a38df3fd0f37a173" target="_blank" rel="noopener noreferrer">
+      🎁 Akses Bonus 400+ Produk Digital Senilai 299.000
+    </a>
+
+    <!-- Tombol Join Komunitas -->
+    <a class="btn-join" href="https://t.me/+YB33rUh5HeE1NjY1" target="_blank" rel="noopener noreferrer">
+      🚀 Join Komunitas Copywriting Untuk Dapetin Update Tools dan Diskusi Langsung
     </a>
   </div>
 
-  <!-- ===== Guard lisensi + Sign out (tetap seperti sebelumnya) ===== -->
   <script type="module">
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyA7sqZCdfYPbO2N8U4aVPFfeUqdy8uU0_o",
       authDomain: "tools-ad-wise.firebaseapp.com",
@@ -116,7 +98,6 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // Guard awal
     const pretty    = localStorage.getItem('license_pretty') || '';
     const sessionId = localStorage.getItem('license_session') || '';
     if(!pretty || !sessionId){ location.href = "index.html"; }
@@ -149,7 +130,6 @@
       const valid = data.activeDeviceId === deviceId && data.activeSessionId === sessionId && isFresh;
       if(!valid){ location.href = "index.html"; return; }
 
-      // heartbeat 30 detik
       window.__hb = setInterval(async ()=>{
         try{ await setDoc(ref,{ lastSeenAt: serverTimestamp() },{ merge:true }); }catch(e){}
       }, 30000);
@@ -166,7 +146,6 @@
     }
     verifyAndStartHeartbeat();
 
-    // Sign out
     document.getElementById('btnSignOut').addEventListener('click', async ()=>{
       try{
         const ref = doc(db,'license_keys',keyId);
