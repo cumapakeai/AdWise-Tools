@@ -128,9 +128,7 @@
 
       if(!valid){ return kick(); }
 
-      window.__hb = setInterval(async ()=>{
-        try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}
-      }, 30000);
+      window.__hb = setInterval(async ()=>{ try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}} , 30000);
 
       window.addEventListener('beforeunload', ()=>{ clearInterval(window.__hb); });
     }catch(_){
@@ -160,45 +158,45 @@
   }
 
   function buildPrompt(idx){
-    const nama = document.getElementById('nama').value.trim();
-    const desk = document.getElementById('desk').value.trim();
+    const nama = (document.getElementById('nama').value || '').trim();
+    const desk = (document.getElementById('desk').value || '').trim();
     const tm   = toTen(document.getElementById('tm').value);
     const val  = toTen(document.getElementById('val').value);
-    const uniq = document.getElementById('uniq').value.trim();
+    const uniq = (document.getElementById('uniq').value || '').trim();
 
-    return `Halo Bro Gua Punya Produk "${nama}"
-Sedikit Deskripsi Tentang Produk Gua "${desk}"
+    return `Halo Bro Gua Punya Produk "${nama || 'Nama Produk'}"
+Sedikit Deskripsi Tentang Produk Gua "${desk || 'Deskripsi Produk'}"
 Produk Gua Itu Target Marketnya Yaitu :
-1. ${tm[0]}
-2. ${tm[1]}
-3. ${tm[2]}
-4. ${tm[3]}
-5. ${tm[4]}
-6. ${tm[5]}
-7. ${tm[6]}
-8. ${tm[7]}
-9. ${tm[8]}
-10. ${tm[9]}
+1. ${tm[0] || ''}
+2. ${tm[1] || ''}
+3. ${tm[2] || ''}
+4. ${tm[3] || ''}
+5. ${tm[4] || ''}
+6. ${tm[5] || ''}
+7. ${tm[6] || ''}
+8. ${tm[7] || ''}
+9. ${tm[8] || ''}
+10. ${tm[9] || ''}
 dan produk gua memiliki beberapa value yaitu :
-1. ${val[0]}
-2. ${val[1]}
-3. ${val[2]}
-4. ${val[3]}
-5. ${val[4]}
-6. ${val[5]}
-7. ${val[6]}
-8. ${val[7]}
-9. ${val[8]}
-10. ${val[9]}
-serta keunikan produk gua dari produk yang sudah ada di pasaran ialah "${uniq}"
+1. ${val[0] || ''}
+2. ${val[1] || ''}
+3. ${val[2] || ''}
+4. ${val[3] || ''}
+5. ${val[4] || ''}
+6. ${val[5] || ''}
+7. ${val[6] || ''}
+8. ${val[7] || ''}
+9. ${val[8] || ''}
+10. ${val[9] || ''}
+serta keunikan produk gua dari produk yang sudah ada di pasaran ialah "${uniq || 'Keunikan Produk'}"
 
-Gua mau lo buatin gua script untuk koten video dengan struktur hook, bridging, isi, value dan CTA gunakan hook yang sangat nancep pada audience shingga konten ini meskipun audience tau tapi tetap tidak mau skip dengan hook yang nancep serta bridging yang semakin membuat audience semakin tidak mau skip begitupun dengan isi serta buat value itu menjelaskan value dari produk gua yang sudah ada diatas, buat sebisa mungkin orang yang nonton merasa value produk ini melebihi ketimbang harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat woerth it, serta buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
+Gua mau lo buatin gua script untuk konten video dengan struktur hook, bridging, isi, value dan CTA. Gunakan hook yang sangat nancep pada audience sehingga konten ini meskipun audience tahu tapi tetap tidak mau skip, dengan hook yang nancep serta bridging yang semakin membuat audience tidak mau skip. Untuk bagian value, jelasin value dari produk gua yang sudah ada di atas. Buat sebisa mungkin orang yang nonton merasa value produk ini melebihi harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat worth it. Lalu buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
 
-Tidak hanya script video bro gua mau lo juga  buatin gua copywriting iklan yang terdiri dari headline, primary text, CTA Button.
+Tidak hanya script video, bro. Gua mau lo juga buatin gua copywriting iklan yang terdiri dari headline, primary text, dan CTA Button.
 
-gua mau lo buat 3 variasi script video untuk konten iklan dan 3 variasi copywriting iklan
+Gua mau lo buat 3 variasi script video untuk konten iklan dan 3 variasi copywriting iklan.
 
-gua mau lo buatin gua dari angle ${angles[idx]}`;
+Gua mau lo buatin gua dari angle ${angles[idx]} (sesuai tombol yang gue klik).`;
   }
 
   window.go = function(idx){
