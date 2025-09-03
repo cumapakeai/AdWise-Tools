@@ -60,16 +60,11 @@
 
     <h1>🎯 Generate Creative Ads</h1>
     <div class="section">
-      <button class="btn" onclick="go(0)">Create Creative Angle PAS</button>
-      <button class="btn" onclick="go(1)">Create Creative Angle Before After</button>
-      <button class="btn" onclick="go(2)">Create Creative Angle Testimoni</button>
-      <button class="btn" onclick="go(3)">Create Creative Angle Edukasi Singkat</button>
-      <button class="btn" onclick="go(4)">Create Creative Angle Urgency</button>
-      <button class="btn" onclick="go(5)">Create Creative Angle Lifestyle</button>
-      <button class="btn" onclick="go(6)">Create Creative Angle Storytelling</button>
+      <!-- Semua tombol angle dihapus, diganti 1 tombol ini saja -->
+      <button class="btn" onclick="go()">Create Creative Ads & Angle</button>
     </div>
 
-    <!-- Tambahan Tombol -->
+    <!-- Tombol lain tetap -->
     <div class="section">
       <button class="btn" onclick="location.href='https://docs.google.com/document/d/1ulWMIVTctCgdDW76qLqrPJ1exfgS4uz6lztulByrbZQ/edit?usp=drive_link'">📑 Contoh Creative Ads yang akan di create</button>
       <button class="btn" onclick="location.href='https://docs.google.com/document/d/1_4fCrzP31G5vYxDolj-CJM7tU60b6bmeaarTWkwshvQ/edit?usp=drive_link'">📥 Paste Create Ads Disini</button>
@@ -136,10 +131,7 @@
 
       if(!valid){ return kick(); }
 
-      window.__hb = setInterval(async ()=>{
-        try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}
-      }, 30000);
-
+      window.__hb = setInterval(async ()=>{ try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}} , 30000);
       window.addEventListener('beforeunload', ()=>{ clearInterval(window.__hb); });
     }catch(_){ kick(); }
   }
@@ -148,24 +140,14 @@
 
   await guard();
 
-  // ================== Logic tombol kreatif ==================
-  const angles = [
-    "Problem → Agitasi → Solusi (Pain Point Based)",
-    "Transformasi / Before After",
-    "Testimoni / Social Proof",
-    "Value Nugget (Edukasi Singkat)",
-    "Urgency & Scarcity",
-    "Lifestyle / Aspirational",
-    "Relatable Storytelling"
-  ];
-
+  // ================== Prompt builder (versi 1 tombol) ==================
   function toTen(txt){
     const arr=(txt||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,10);
     while(arr.length<10) arr.push('');
     return arr;
   }
 
-  function buildPrompt(idx){
+  function buildPrompt(){
     const nama = (document.getElementById('nama').value || '').trim();
     const desk = (document.getElementById('desk').value || '').trim();
     const tm   = toTen(document.getElementById('tm').value);
@@ -198,23 +180,29 @@ dan produk gua memiliki beberapa value yaitu :
 10. ${val[9] || ''}
 serta keunikan produk gua dari produk yang sudah ada di pasaran ialah "${uniq || 'Keunikan Produk'}"
 
-Gua mau lo buatin gua script untuk konten video dengan struktur hook, bridging, isi, value dan CTA. Gunakan hook yang sangat nancep pada audience sehingga konten ini meskipun audience tahu tapi tetap tidak mau skip, dengan hook yang nancep serta bridging yang semakin membuat audience tidak mau skip. Untuk bagian value, jelasin value dari produk gua yang sudah ada di atas. Buat sebisa mungkin orang yang nonton merasa value produk ini melebihi harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat worth it. Lalu buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
+Gua mau lo buatin gua script untuk konten video dengan struktur hook, bridging, isi, value dan CTA gunakan hook yang sangat nancep pada audience sehingga konten ini meskipun audience tahu tapi tetap tidak mau skip dengan hook yang nancep serta bridging yang semakin membuat audience semakin tidak mau skip, begitu pun dengan isi. Untuk value, jelasin value dari produk gua yang sudah ada di atas. Buat sebisa mungkin orang yang nonton merasa value produk ini melebihi ketimbang harganya sehingga harga produk gua terlihat murah tapi tidak murahan dan sangat worth it, serta buat CTA yang membuat audience tidak mau menunda untuk membeli produk gua.
 
-Tidak hanya script video, bro. Gua mau lo juga buatin gua copywriting iklan yang terdiri dari headline, primary text, dan CTA Button.
+Gua mau lo buatin gua script konten iklannya dari 7 angle yaitu:
+1. "Problem → Agitasi → Solusi (Pain Point Based)"
+2. Transformasi / Before After
+3. Testimoni / Social Proof
+4. Value Nugget (Edukasi Singkat)
+5. Urgency & Scarcity
+6. Lifestyle / Aspirational
+7. Relatable Storytelling
 
-Gua mau lo buat 3 variasi script video untuk konten iklan dan 3 variasi copywriting iklan.
+Buat 3 variasi script langsung dengan durasi video maksimal 90 detik namun script yang padat (bukan cuma pendek), sehingga benar-benar bisa dijadikan video untuk tiap angle.
 
-Gua mau lo buatin gua dari angle ${angles[idx]} (sesuai tombol yang gue klik).`;
+Gua juga mau lo buatin gua copywriting iklan yang terdiri dari headline, primary text, dan CTA Button — buat 3 variasi langsung untuk setiap angle yang sama dengan script video.`;
   }
 
   // ====== OPEN CHATGPT DENGAN GUARD PANJANG URL ======
   function safeOpenChatWithPrompt(prompt) {
-    const MAX_SAFE = 1800; // jaga-jaga antar browser/OS
+    const MAX_SAFE = 1800; // guard beda limit antar browser/OS
     if (prompt.length < MAX_SAFE) {
       const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
       window.open(url, "_blank");
     } else {
-      // Fallback: copy -> buka ChatGPT kosong -> user paste
       const openBlank = () => window.open("https://chat.openai.com/", "_blank");
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(prompt).then(() => {
@@ -223,22 +211,21 @@ Gua mau lo buatin gua dari angle ${angles[idx]} (sesuai tombol yang gue klik).`;
         }).catch(() => {
           const blob = new Blob([prompt], { type: "text/plain" });
           const url = URL.createObjectURL(blob);
-          openBlank();
-          window.open(url, "_blank");
+          openBlank(); window.open(url, "_blank");
           alert("Prompt kepanjangan & gagal auto-copy. Tab baru berisi prompt dibuka—salin lalu paste ke ChatGPT.");
         });
       } else {
         const blob = new Blob([prompt], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
-        openBlank();
-        window.open(url, "_blank");
+        openBlank(); window.open(url, "_blank");
         alert("Prompt kepanjangan. Tab baru berisi prompt dibuka—salin lalu paste ke ChatGPT.");
       }
     }
   }
 
-  window.go = function(idx){
-    const prompt = buildPrompt(idx);
+  // tombol 1-klik
+  window.go = function(){
+    const prompt = buildPrompt();
     safeOpenChatWithPrompt(prompt);
   };
   </script>
