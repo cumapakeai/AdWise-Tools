@@ -31,6 +31,16 @@
     .footerBtns{display:grid;grid-template-columns:1fr 160px;gap:12px;margin-top:20px}
     @media(max-width:600px){.footerBtns{grid-template-columns:1fr}}
   </style>
+
+  <!-- Cache-busting sederhana untuk GitHub Pages -->
+  <script>
+    (function(){
+      const VER = 'v3';
+      if (!location.search.includes('v=')) {
+        history.replaceState(null, '', location.pathname + '?v=' + VER);
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="container">
@@ -88,9 +98,7 @@
   // ===== Guard lisensi =====
   const pretty    = localStorage.getItem('license_pretty') || '';
   const sessionId = localStorage.getItem('license_session') || '';
-  if (!pretty || !sessionId) {
-    location.href = "index.html";
-  }
+  if (!pretty || !sessionId) { location.href = "index.html"; }
   const keyId = pretty.replace(/-/g,'');
 
   async function getDeviceId(){
@@ -128,12 +136,12 @@
 
       if(!valid){ return kick(); }
 
-      window.__hb = setInterval(async ()=>{ try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}} , 30000);
+      window.__hb = setInterval(async ()=>{
+        try{ await setDoc(ref, { lastSeenAt: serverTimestamp() }, { merge:true }); }catch(_){}
+      }, 30000);
 
       window.addEventListener('beforeunload', ()=>{ clearInterval(window.__hb); });
-    }catch(_){
-      kick();
-    }
+    }catch(_){ kick(); }
   }
 
   function kick(){ location.href = "index.html"; }
@@ -199,10 +207,39 @@ Gua mau lo buat 3 variasi script video untuk konten iklan dan 3 variasi copywrit
 Gua mau lo buatin gua dari angle ${angles[idx]} (sesuai tombol yang gue klik).`;
   }
 
+  // ====== OPEN CHATGPT DENGAN GUARD PANJANG URL ======
+  function safeOpenChatWithPrompt(prompt) {
+    const MAX_SAFE = 1800; // jaga-jaga antar browser/OS
+    if (prompt.length < MAX_SAFE) {
+      const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+      window.open(url, "_blank");
+    } else {
+      // Fallback: copy -> buka ChatGPT kosong -> user paste
+      const openBlank = () => window.open("https://chat.openai.com/", "_blank");
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(prompt).then(() => {
+          openBlank();
+          alert("Prompt kepanjangan, sudah dicopy ke clipboard. Buka tab ChatGPT yang baru & paste (Ctrl/Cmd+V).");
+        }).catch(() => {
+          const blob = new Blob([prompt], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          openBlank();
+          window.open(url, "_blank");
+          alert("Prompt kepanjangan & gagal auto-copy. Tab baru berisi prompt dibuka—salin lalu paste ke ChatGPT.");
+        });
+      } else {
+        const blob = new Blob([prompt], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        openBlank();
+        window.open(url, "_blank");
+        alert("Prompt kepanjangan. Tab baru berisi prompt dibuka—salin lalu paste ke ChatGPT.");
+      }
+    }
+  }
+
   window.go = function(idx){
     const prompt = buildPrompt(idx);
-    const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
-    window.open(url, '_blank');
+    safeOpenChatWithPrompt(prompt);
   };
   </script>
 </body>
